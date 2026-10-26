@@ -1,0 +1,6 @@
+export(read_sc_batch)
+export(read_sc_data)
+export(scan_sc_data)
+export(validate_sc_data)
+S3method(print,sc_scan)
+

@@ -1,0 +1,6 @@
+^\.git$
+^\.github$
+^scAutoLoad\.Rproj$
+^demo_cases$
+^examples$
+
