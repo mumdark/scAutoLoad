@@ -39,6 +39,14 @@
        seuratobject_version = as.character(utils::packageVersion("SeuratObject")))
 }
 
+.sc_set_sample_identity <- function(object, sample_id, set_orig_ident = FALSE) {
+  metadata <- object@meta.data
+  metadata$sample_id <- as.character(sample_id)[1L]
+  if (isTRUE(set_orig_ident)) metadata$orig.ident <- as.character(sample_id)[1L]
+  object@meta.data <- metadata
+  object
+}
+
 .sc_read_metadata <- function(metadata, cell_names, sample_id) {
   if (is.null(metadata)) return(NULL)
   if (is.character(metadata) && length(metadata) == 1L) {
@@ -72,4 +80,3 @@
   metadata$orig.ident <- sample_id
   metadata
 }
-
