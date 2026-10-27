@@ -9,7 +9,7 @@ read_sc_data(path, sample_id = NULL, format = "auto", version = "auto",
 }
 \arguments{
 \item{path}{A matrix file, RDS/HDF5 file, or directory containing one dataset.}
-\item{sample_id}{Optional sample identifier; defaults to a name inferred from the path.}
+\item{sample_id}{Optional sample identifier; defaults to a name inferred from the file or containing folder and is stored in cell metadata.}
 \item{format}{Input format, or \code{"auto"} to detect it.}
 \item{version}{Seurat assay layout: \code{"auto"}, \code{"v4"} (legacy Assay), or \code{"v5"} (Assay5).}
 \item{orientation}{Logical orientation: \code{TRUE} means features in rows and cells in columns; \code{FALSE} means cells in rows and features in columns. If omitted, orientation is detected from identifiers and falls back to \code{TRUE} when ambiguous. Explicitly passing \code{TRUE} or \code{FALSE} forces it.}
@@ -31,4 +31,3 @@ A Seurat object, or an object and import report when requested.
 Reads supported single-cell formats, detects or applies matrix orientation,
 and creates an object using the requested Seurat assay layout.
 }
-
