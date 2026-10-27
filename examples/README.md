@@ -26,8 +26,11 @@ objects.
 
 ## R calls for every case
 
-Run only the calls you need; each multi-sample call keeps its objects in a list.
-For the large TXT case, use the sequential runner below to limit memory use.
+Run only the calls you need. Multi-sample calls return one merged Seurat object
+by default. Sample IDs are inferred from the input file names or sample-folder
+names and are added to the `sample_id` and `orig.ident` metadata columns. Pass
+`merge = FALSE` to keep a named list of per-sample objects. For the large TXT
+case, use the sequential runner below to limit memory use.
 
 ```r
 library(scAutoLoad)
@@ -36,7 +39,7 @@ root <- "demo_cases"
 # 1. Standard 10x MTX: AD1, AD2, CO1, and CO2 samples
 mtx <- read_sc_batch(
   file.path(root, "标准10X读入------.GSE213216"),
-  formats = "10x_mtx", version = "auto", merge = FALSE
+  formats = "10x_mtx", version = "auto"
 )
 
 # 2. One 10x HDF5 file
@@ -58,25 +61,25 @@ rds_object <- read_sc_data(
 # 5. Transposed gzip CSV files: cells in rows, features in columns
 csv_transposed <- read_sc_batch(
   file.path(root, "多个gz倒置xls------GSE118828"),
-  formats = "csv", version = "auto", merge = FALSE
+  formats = "csv", version = "auto"
 )
 
 # 6. Multiple .csv.gz matrices
 csv_gz <- read_sc_batch(
   file.path(root, "多个gz的csv文件"),
-  formats = "csv", version = "auto", merge = FALSE
+  formats = "csv", version = "auto"
 )
 
 # 7. Multiple .tsv.gz matrices
 tsv_gz <- read_sc_batch(
   file.path(root, "多个gz的tsv文件"),
-  formats = "tsv", version = "auto", merge = FALSE
+  formats = "tsv", version = "auto"
 )
 
 # 8. Multiple 10x HDF5 files
 h5_many <- read_sc_batch(
   file.path(root, "多个H5读入"),
-  formats = "10x_h5", version = "auto", merge = FALSE
+  formats = "10x_h5", version = "auto"
 )
 
 # 9. GEO TXT matrix; the delimiter is TAB and blank values are filled with 0
@@ -93,8 +96,8 @@ csv_gz_one <- read_sc_data(
 )
 
 # Inspect dimensions and validity, for example:
-dim(csv_transposed[[1]])
-validate_sc_data(csv_transposed[[1]])
+dim(csv_transposed)
+validate_sc_data(csv_transposed)
 
 # Force cells in rows and features in columns for a known input layout:
 # read_sc_data("sample.csv.gz", orientation = FALSE)
@@ -124,4 +127,3 @@ Rscript examples/run_real_cases.R csv_gz_single
 The runner prints the scan results, imported dimensions, and validation checks.
 It reads the three large TXT matrices one at a time and releases each object
 before continuing.
-
