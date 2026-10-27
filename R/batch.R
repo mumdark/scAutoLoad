@@ -21,8 +21,10 @@
 #' @param path Directory to scan.
 #' @param recursive Whether to scan nested directories.
 #' @param sample_metadata Optional sample-level data frame keyed by `sample_id`.
-#' @param merge Combine samples into one Seurat object. Sample names are prefixed
-#'   to cell barcodes and stored as `orig.ident`.
+#' @param merge Combine samples into one Seurat object (default). Sample names
+#'   inferred from file or folder names are prefixed to cell barcodes and stored
+#'   in the `sample_id` and `orig.ident` metadata columns. Set `FALSE` to return
+#'   a named list of per-sample objects.
 #' @param version Seurat assay layout, passed to [read_sc_data()].
 #' @param orientation Logical orientation: `TRUE` means features in rows and
 #'   cells in columns; `FALSE` means cells in rows and features in columns. If
@@ -36,11 +38,12 @@
 #' @param return_report If `TRUE`, return imported object(s) with a combined report.
 #' @param formats Optional character vector selecting formats from the scan,
 #'   such as `"10x_mtx"`, `"csv"`, `"tsv"`, `"txt"`, `"10x_h5"`, or `"rds"`.
-#' @return A named list of Seurat objects, a merged Seurat object, or a list
-#'   containing object(s) and the import report.
+#' @return By default, a merged Seurat object. With `merge = FALSE`, a named
+#'   list of per-sample objects. With `return_report = TRUE`, the object(s) and
+#'   import reports are returned in a list.
 #' @export
 read_sc_batch <- function(path, recursive = TRUE, sample_metadata = NULL,
-                          merge = FALSE, version = "auto",
+                          merge = TRUE, version = "auto",
                           orientation = TRUE, data_type = "counts",
                           assay = "RNA", delimiter = NULL,
                           return_report = FALSE, formats = NULL,
@@ -49,6 +52,9 @@ read_sc_batch <- function(path, recursive = TRUE, sample_metadata = NULL,
   orientation <- .sc_normalize_orientation(orientation)
   if (!is.logical(na_to_zero) || length(na_to_zero) != 1L || is.na(na_to_zero)) {
     .sc_abort("`na_to_zero` must be one logical value: TRUE or FALSE.")
+  }
+  if (!is.logical(merge) || length(merge) != 1L || is.na(merge)) {
+    .sc_abort("`merge` must be one logical value: TRUE or FALSE.")
   }
   found <- scan_sc_data(path, recursive = recursive, orientation = orientation)
   if (!is.null(formats)) {
@@ -84,7 +90,7 @@ read_sc_batch <- function(path, recursive = TRUE, sample_metadata = NULL,
     )
     if (!orientation_was_missing) read_args$orientation <- orientation
     ans <- do.call(read_sc_data, read_args)
-    objects[[i]] <- ans$object
+    objects[[i]] <- .sc_set_sample_identity(ans$object, ids[[i]], set_orig_ident = TRUE)
     reports[[i]] <- ans$report
   }
   if (!merge) {
@@ -102,4 +108,3 @@ read_sc_batch <- function(path, recursive = TRUE, sample_metadata = NULL,
   if (return_report) return(list(object = merged, report = reports))
   merged
 }
-
