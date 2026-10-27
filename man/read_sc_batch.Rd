@@ -2,7 +2,7 @@
 \alias{read_sc_batch}
 \title{Read All Detected Samples in a Directory}
 \usage{
-read_sc_batch(path, recursive = TRUE, sample_metadata = NULL, merge = FALSE,
+read_sc_batch(path, recursive = TRUE, sample_metadata = NULL, merge = TRUE,
   version = "auto", orientation = TRUE, data_type = "counts",
   assay = "RNA", delimiter = NULL, return_report = FALSE, formats = NULL,
   na_to_zero = TRUE)
@@ -11,7 +11,7 @@ read_sc_batch(path, recursive = TRUE, sample_metadata = NULL, merge = FALSE,
 \item{path}{Directory to scan.}
 \item{recursive}{Whether to scan nested directories.}
 \item{sample_metadata}{Optional sample-level data frame keyed by \code{sample_id}.}
-\item{merge}{Combine samples into one Seurat object. Sample names are prefixed to cell barcodes and stored as \code{orig.ident}. For \code{data_type = "data"}, normalized values are retained during the merge.}
+\item{merge}{Combine samples into one Seurat object (default). Sample names inferred from file or folder names are prefixed to cell barcodes and stored in the \code{sample_id} and \code{orig.ident} metadata columns. Set \code{FALSE} to return a named list of per-sample objects. For \code{data_type = "data"}, normalized values are retained during the merge.}
 \item{version}{Seurat assay layout, passed to \code{read_sc_data()}.}
 \item{orientation}{Logical orientation: \code{TRUE} means features in rows and cells in columns; \code{FALSE} means cells in rows and features in columns. If omitted, each sample is auto-detected and ambiguous matrices use \code{TRUE}.}
 \item{data_type}{\code{"counts"} by default; use \code{"data"} for normalized expression.}
@@ -24,11 +24,11 @@ print how many values were replaced for each sample. Set \code{FALSE} to retain 
 stop before creating the Seurat object.}
 }
 \value{
-A named list of Seurat objects, a merged Seurat object, or a list containing
-object(s) and the import report.
+By default, a merged Seurat object. With \code{merge = FALSE}, a named list of
+per-sample objects. With \code{return_report = TRUE}, the object(s) and import
+reports are returned in a list.
 }
 \description{
 Scans a directory and reads each detected sample. Incomplete 10x MTX datasets
 and duplicate sample IDs are reported as errors rather than silently skipped.
 }
-
