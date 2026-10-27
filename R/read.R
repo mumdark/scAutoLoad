@@ -87,7 +87,8 @@
 #' Read a single-cell dataset into a Seurat object
 #'
 #' @param path A matrix file, RDS/HDF5 file, or directory containing one dataset.
-#' @param sample_id Optional sample identifier; defaults to a name inferred from the path.
+#' @param sample_id Optional sample identifier; defaults to a name inferred
+#'   from the file or containing folder and is stored in cell metadata.
 #' @param format Input format, or `"auto"` to detect it.
 #' @param version Seurat assay layout: `"auto"`, `"v4"` (legacy Assay), or `"v5"` (Assay5).
 #' @param orientation Logical orientation: `TRUE` means features in rows and
@@ -147,6 +148,7 @@ read_sc_data <- function(path, sample_id = NULL, format = "auto",
       metadata_df <- .sc_read_metadata(metadata, colnames(object), inferred_sample)
       object <- SeuratObject::AddMetaData(object, metadata = metadata_df)
     }
+    object <- .sc_set_sample_identity(object, inferred_sample)
     report <- list(
       sample_id = inferred_sample, source = candidate$matrix_path[[1L]],
       format = fmt, source_class = imported$source_class,
@@ -238,9 +240,8 @@ read_sc_data <- function(path, sample_id = NULL, format = "auto",
     original_cell_names = imported$original_cell_names,
     warnings = warnings
   )
-  object <- created$object
+  object <- .sc_set_sample_identity(created$object, inferred_sample)
   object@misc$scAutoLoad <- report
   if (return_report) return(list(object = object, report = report))
   object
 }
-
