@@ -49,6 +49,10 @@ obj <- read_sc_data(
   version = "auto"
 )
 
+obj_merged <- read_sc_batch("./GEO_data") # merge = TRUE by default
+table(obj_merged$sample_id)
+
+# Keep samples as separate objects when needed:
 objects <- read_sc_batch("./GEO_data", merge = FALSE)
 validate_sc_data(obj)
 ```
@@ -66,8 +70,11 @@ the default input type. Non-integer values produce a warning so that
 normalized expression matrices are not mistaken for raw counts.
 
 Duplicate feature names are made unique without summing rows; the original
-names are retained in the import report. Batch merges prefix cell names with
-sample IDs and store sample identity in metadata.
+names are retained in the import report. `read_sc_batch()` merges all detected
+samples into one Seurat object by default. It infers each sample ID from its
+file name or containing folder, prefixes cell names with that ID, and records
+it in both the `sample_id` and `orig.ident` metadata columns. Set `merge = FALSE`
+to return one object per sample.
 
 Delimited text matrices are read into memory before conversion to a sparse
 matrix. Large dense CSV/TSV/TXT files can require several times their file size
@@ -80,4 +87,3 @@ runner that processes one case at a time. The original case data is about
 1.8 GiB and is not included in the GitHub repository or package builds. To run
 the integration examples, copy the supplied case folders into `demo_cases/`
 under the source checkout, then follow [`examples/README.md`](examples/README.md).
-
